@@ -45,11 +45,11 @@ jobs:
 
       - name: Push Docker image to Heroku
         run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/demo-app:latest registry.heroku.com/<your-app-name>/web
-          docker push registry.heroku.com/<your-app-name>/web
+          docker tag ${{ secrets.DOCKER_USERNAME }}/demo-app:latest registry.heroku.com/pracga-demo-app/web
+          docker push registry.heroku.com/pracga-demo-app/web
 
       - name: Release Heroku app
         run: |
-          heroku container:release web --app <your-app-name>
+          heroku container:release web --app pracga-demo-app
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
