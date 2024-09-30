@@ -21,15 +21,6 @@ jobs:
         with:
           node-version: '20'
 
-      # Optional: Cache Node.js dependencies to speed up builds
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Install dependencies
         run: npm install
 
@@ -46,3 +37,19 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/demo-app:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/demo-app:latest
+
+      - name: Log in to Heroku container registry
+        run: echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+      - name: Push Docker image to Heroku
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/demo-app:latest registry.heroku.com/<your-app-name>/web
+          docker push registry.heroku.com/<your-app-name>/web
+
+      - name: Release Heroku app
+        run: |
+          heroku container:release web --app <your-app-name>
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
